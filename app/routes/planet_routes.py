@@ -1,4 +1,4 @@
-from flask import Blueprint
+from flask import abort, Blueprint, make_response
 from app.models.planet import planets
 
 
@@ -26,3 +26,32 @@ def get_all_planet():
         ))
     
     return result
+
+
+@planet_bp.get("/<id>")
+def get_one_planet(id):
+    planet = validate_planet(id)
+    planet_dict = dict(
+        id=planet.id,
+        name=planet.name,
+        description=planet.description,
+        moon=planet.moon
+    )
+
+    return planet_dict
+
+
+def validate_planet(id):
+    try:
+        id = int(id)
+    except ValueError:
+        invalid_planet = {"message": f"The id ({id}) is invalid."}
+        abort(make_response(invalid_planet, 400))
+    
+    for planet in planets:
+        if planet.id == id:
+            return planet
+    
+    not_found = {"message": f"Planet with id ({id}) is not found"}    
+    abort(make_response(not_found, 404))
+        
