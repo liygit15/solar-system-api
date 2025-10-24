@@ -1,8 +1,52 @@
-from flask import abort, Blueprint, make_response
-# from app.models.planet import planets
+from flask import abort, Blueprint, make_response, request
+from app.models.planet import Planet
+from ..db import db
 
 
 planet_bp = Blueprint("planets", __name__, url_prefix="/planets")
+
+@planet_bp.post("")
+def create_planet():
+    request_body = request.get_json()
+    name = request_body["name"]
+    description = request_body["description"]
+    moon = request_body["moon"]
+
+    new_planet = Planet(
+        name=name,
+        description=description,
+        moon=moon
+    )
+    db.session.add(new_planet)
+    db.session.commit()
+
+    planet_response = dict(
+        id=new_planet.id,
+        name=new_planet.name,
+        description=new_planet.description,
+        moon=new_planet.moon
+    )
+
+    return planet_response, 201
+
+@planet_bp.get("")
+def get_all_planets():
+    query = db.select(Planet).order_by(Planet.id)
+    planets = db.session.scalars(query)
+    result_list = []
+
+    for planet in planets:
+        result_list.append(dict(
+            id=planet.id,
+            name=planet.name,
+            description=planet.description,
+            moon=planet.moon
+        ))
+
+    return result_list
+
+
+
 
 # @planet_bp.get("")
 # def get_all_planet():
@@ -28,30 +72,30 @@ planet_bp = Blueprint("planets", __name__, url_prefix="/planets")
     # return result
 
 
-@planet_bp.get("/<id>")
-def get_one_planet(id):
-    planet = validate_planet(id)
-    planet_dict = dict(
-        id=planet.id,
-        name=planet.name,
-        description=planet.description,
-        moon=planet.moon
-    )
+# @planet_bp.get("/<id>")
+# def get_one_planet(id):
+#     planet = validate_planet(id)
+#     planet_dict = dict(
+#         id=planet.id,
+#         name=planet.name,
+#         description=planet.description,
+#         moon=planet.moon
+#     )
 
-    return planet_dict
+#     return planet_dict
 
 
-def validate_planet(id):
-    try:
-        id = int(id)
-    except ValueError:
-        invalid_planet = {"message": f"The id ({id}) is invalid."}
-        abort(make_response(invalid_planet, 400))
+# def validate_planet(id):
+#     try:
+#         id = int(id)
+#     except ValueError:
+#         invalid_planet = {"message": f"The id ({id}) is invalid."}
+#         abort(make_response(invalid_planet, 400))
     
-    for planet in planets:
-        if planet.id == id:
-            return planet
+#     for planet in planets:
+#         if planet.id == id:
+#             return planet
     
-    not_found = {"message": f"Planet with id ({id}) is not found"}    
-    abort(make_response(not_found, 404))
+#     not_found = {"message": f"Planet with id ({id}) is not found"}    
+#     abort(make_response(not_found, 404))
         
