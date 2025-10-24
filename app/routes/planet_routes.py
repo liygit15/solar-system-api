@@ -1,12 +1,12 @@
 from flask import abort, Blueprint, make_response
-from app.models.planet import planets
+# from app.models.planet import planets
 
 
 planet_bp = Blueprint("planets", __name__, url_prefix="/planets")
 
-@planet_bp.get("")
-def get_all_planet():
-    result = []
+# @planet_bp.get("")
+# def get_all_planet():
+#     result = []
     # for planet in planets:
     #     result.append(
     #         {
@@ -17,15 +17,15 @@ def get_all_planet():
     #         }
     #     )
 
-    for planet in planets:
-        result.append(dict(
-            id=planet.id,
-            name=planet.name,
-            description=planet.description,
-            moon=planet.moon
-        ))
+    # for planet in planets:
+    #     result.append(dict(
+    #         id=planet.id,
+    #         name=planet.name,
+    #         description=planet.description,
+    #         moon=planet.moon
+    #     ))
     
-    return result
+    # return result
 
 
 @planet_bp.get("/<id>")

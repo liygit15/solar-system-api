@@ -1,13 +1,9 @@
-class Planet:
-    def __init__(self, id, name, description, moon):
-        self.id = id 
-        self.name = name
-        self.description = description
-        self.moon = moon
-    
+from sqlalchemy.orm import Mapped, mapped_column
+from ..db import db
 
-planets = [
-    Planet(1, "Earth", "a beatutify star", "1 Moon"),
-    Planet(2, "Pluto", "A totally real planet", "3 Moons"),
-    Planet(3, "Mars", "big star", "0 moons")
-    ]
+class Planet(db.Model):
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    name: Mapped[str]
+    description: Mapped[str]
+    moon: Mapped[str]
+    
