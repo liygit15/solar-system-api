@@ -31,7 +31,18 @@ def create_planet():
 
 @planet_bp.get("")
 def get_all_planets():
-    query = db.select(Planet).order_by(Planet.id)
+    query = db.select(Planet)
+
+    description_param = request.args.get("description")
+    if description_param:
+        query = query.where(Planet.description.ilike(f"%{description_param}%"))
+    
+    moon_param = request.args.get("moon")
+    if moon_param:
+        query = query.where(Planet.moon.ilike(f"%{moon_param}%"))
+
+
+    query = query.order_by(Planet.id)
     planets = db.session.scalars(query)
     result_list = []
 
