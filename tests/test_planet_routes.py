@@ -17,7 +17,6 @@ def test_get_one_planet(client, one_planet):
     # Assert
     assert response.status_code == 200
     assert response_body == {
-        "id": 1,
         "name": "planet_x",
         "description": "xxxx",
         "moon": "x moons"
@@ -37,7 +36,6 @@ def test_create_one_planet(client):
     # Assert
     assert response.status_code == 201
     assert response_body == {
-        "id": 1,
         "name": "planet_y",
         "description": "yyyy",
         "moon": "y moons"

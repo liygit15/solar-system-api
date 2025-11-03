@@ -7,3 +7,16 @@ class Planet(db.Model):
     description: Mapped[str]
     moon: Mapped[str]
     
+    def to_dict(self):
+        return {
+            "name": self.name,
+            "description": self.description,
+            "moon": self.moon
+        }
+
+    @classmethod
+    def from_dict(cls, data):
+        return cls(name = data["name"],
+                description = data["description"],
+                moon = data["moon"])
+        
