@@ -38,7 +38,7 @@ def one_planet(app):
     planet = Planet(
     name="planet_x",
     description="xxxx", 
-    moon="x moons"
+    star="x stars"
     )
     db.session.add(planet)
     db.session.commit()

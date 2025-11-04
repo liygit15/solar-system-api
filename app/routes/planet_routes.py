@@ -1,7 +1,8 @@
 from flask import abort, Blueprint, make_response, request, Response
 from app.models.planet import Planet
+from app.models.moon import Moon
 from ..db import db
-from .routes_utilities import validate_model
+from .routes_utilities import validate_model, create_model, get_models_with_filters
 
 
 bp = Blueprint("planets", __name__, url_prefix="/planets")
@@ -9,50 +10,33 @@ bp = Blueprint("planets", __name__, url_prefix="/planets")
 @bp.post("")
 def create_planet():
     request_body = request.get_json()
-    # name = request_body["name"]
-    # description = request_body["description"]
-    # moon = request_body["moon"]
 
-    # new_planet = Planet(
-    #     name=name,
-    #     description=description,
-    #     moon=moon
-    # )
-    new_planet = Planet.from_dict(request_body)
+    return create_model(Planet, request_body)
 
-    db.session.add(new_planet)
-    db.session.commit()
 
-    # planet_response = dict(
-    #     id=new_planet.id,
-    #     name=new_planet.name,
-    #     description=new_planet.description,
-    #     moon=new_planet.moon
-    # )
+@bp.post("/<planet_id>/moons")
+def create_moon_with_planet_id(planet_id):
+    planet = validate_model(Planet, planet_id)
 
-    return make_response(new_planet.to_dict(), 201)
+    request_body = request.get_json()
+    request_body["planet_id"] = planet.id
+
+    return create_model(Moon, request_body)
+
+    # try:
+    #     new_moon = Moon.from_dict(request_body)
+    # except KeyError as error:
+    #     return {"Message": f"Invalid request: missing {error.args[0]}"}, 400
+        
+    # db.session.add(new_moon)
+    # db.session.commit()
+
+    # return new_moon.to_dict(), 201
+
 
 @bp.get("")
 def get_all_planets():
-    query = db.select(Planet)
-
-    description_param = request.args.get("description")
-    if description_param:
-        query = query.where(Planet.description.ilike(f"%{description_param}%"))
-    
-    moon_param = request.args.get("moon")
-    if moon_param:
-        query = query.where(Planet.moon.ilike(f"%{moon_param}%"))
-
-
-    query = query.order_by(Planet.id)
-    planets = db.session.scalars(query)
-    result_list = []
-
-    for planet in planets:
-        result_list.append(planet.to_dict())
-
-    return result_list
+    return get_models_with_filters(Planet, request.args)
 
 
 @bp.get("/<id>")
@@ -61,7 +45,12 @@ def get_one_planet(id):
 
     return planet.to_dict()
 
+@bp.get("/<id>/moons")
+def get_all_planet_moons(id):
+    planet = validate_model(Planet, id)
+    moons = [moon.to_dict() for moon in planet.moons]
 
+    return moons
 
 
 @bp.put("/<id>")
@@ -71,7 +60,7 @@ def replace_planet(id):
 
     planet.name = request_body["name"]
     planet.description = request_body["description"]
-    planet.moon = request_body["moon"]
+    planet.star = request_body["star"]
 
     db.session.commit()
     return Response(status=204, mimetype="application/json")
@@ -98,7 +87,7 @@ def delete_planet(id):
     #             "id": planet.id,
     #             "name":planet.name,
     #             "description":planet.description,
-    #             "moon":planet.moon
+    #             "star":planet.star
     #         }
     #     )
 
@@ -107,7 +96,7 @@ def delete_planet(id):
     #         id=planet.id,
     #         name=planet.name,
     #         description=planet.description,
-    #         moon=planet.moon
+    #         star=planet.star
     #     ))
     
     # return result

@@ -19,7 +19,7 @@ def test_get_one_planet(client, one_planet):
     assert response_body == {
         "name": "planet_x",
         "description": "xxxx",
-        "moon": "x moons"
+        "star": "x stars"
     }
 
 
@@ -29,7 +29,7 @@ def test_create_one_planet(client):
     response = client.post("/planets", json={
         "name": "planet_y",
         "description": "yyyy",
-        "moon": "y moons"
+        "star": "y stars"
     })
     response_body = response.get_json()
 
@@ -38,5 +38,5 @@ def test_create_one_planet(client):
     assert response_body == {
         "name": "planet_y",
         "description": "yyyy",
-        "moon": "y moons"
+        "star": "y stars"
     }
